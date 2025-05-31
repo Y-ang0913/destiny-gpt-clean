@@ -1,4 +1,4 @@
-import { OpenAI } from 'openai';
+import OpenAI from 'openai';
 import { writeToNotion } from '../../utils/notion';
 
 const openai = new OpenAI({
@@ -34,9 +34,7 @@ export default async function handler(req, res) {
 
     res.status(200).json({ reply });
   } catch (error) {
-    console.error('Error handling GPT or Notion:', error);
-    res.status(500).json({ error: 'Internal Server Error' });
+    console.error('API Error:', error);
+    res.status(500).json({ error: 'Something went wrong' });
   }
 }
-
-// updated: fixed OpenAI import issue and added error handling

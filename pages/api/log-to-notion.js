@@ -11,7 +11,6 @@ export default async function handler(req, res) {
   }
 
   const { question } = req.body;
-
   if (!question) {
     return res.status(400).json({ error: 'Question is required' });
   }
@@ -33,8 +32,8 @@ export default async function handler(req, res) {
     });
 
     res.status(200).json({ reply });
-  } catch (error) {
-    console.error('API Error:', error);
-    res.status(500).json({ error: 'Something went wrong' });
+  } catch (err) {
+    console.error('Error:', err);
+    res.status(500).json({ error: 'Internal Server Error' });
   }
 }

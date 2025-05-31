@@ -1,5 +1,6 @@
 import { Configuration, OpenAIApi } from 'openai'
-import { writeToNotion } from '@/utils/notion'
+import { writeToNotion } from '../../utils/notion'
+
 
 export default async function handler(req, res) {
   if (req.method !== 'POST') return res.status(405).end()

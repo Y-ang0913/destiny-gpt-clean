@@ -1,39 +1,39 @@
-import OpenAI from 'openai';
 import { writeToNotion } from '../../utils/notion';
 
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
-});
-
 export default async function handler(req, res) {
-  if (req.method !== 'POST') {
-    return res.status(405).end();
-  }
+  if (req.method !== 'POST') return res.status(405).end();
 
   const { question } = req.body;
-  if (!question) {
-    return res.status(400).json({ error: 'Question is required' });
-  }
+  if (!question) return res.status(400).json({ error: 'Question is required' });
 
   try {
-    const completion = await openai.chat.completions.create({
-      model: 'gpt-4o',
-      messages: [{ role: 'user', content: question }],
+    const apiKey = process.env.OPENAI_API_KEY;
+    const completionRes = await fetch('https://api.openai.com/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${apiKey}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        model: 'gpt-4o',
+        messages: [{ role: 'user', content: question }]
+      })
     });
 
-    const reply = completion.choices?.[0]?.message?.content || 'No response.';
+    const data = await completionRes.json();
+    const reply = data.choices?.[0]?.message?.content || 'No response.';
 
     await writeToNotion({
       question,
       reply,
       time: new Date().toISOString(),
       source: 'Vercel',
-      note: 'Auto',
+      note: 'Auto'
     });
 
-    res.status(200).json({ reply });
-  } catch (err) {
-    console.error('Error:', err);
-    res.status(500).json({ error: 'Internal Server Error' });
+    return res.status(200).json({ reply });
+  } catch (error) {
+    console.error('API Error:', error);
+    return res.status(500).json({ error: 'Internal Server Error' });
   }
 }
